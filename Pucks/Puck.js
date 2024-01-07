@@ -1,16 +1,18 @@
 import { Vector } from "../Vector.js";
-
-function randomNumBetween(min, max) {
-  return min + Math.random() * (max - min);
-}
+import { Utility } from "../Utility.js";
 
 export class Puck {
   constructor(x, y) {
     this.pos = new Vector(x, y);
     this.vel = Vector.random(-1, 1, -1, 1);
     this.acc = new Vector(0, 0);
-    this.radius = Math.floor(randomNumBetween(5, 50));
-    this.MAX_VELOCITY = 5;
+    this.radius = Math.floor(Utility.randomNumBetween(5, 50));
+    this.MAX_VELOCITY = 4;
+
+    this.isFlamable = false;
+    this.isBreakable = false;
+
+    this.fillStyle = `rgba(255, 255, 255, 1)`;
   }
 
   update() {
@@ -81,6 +83,7 @@ export class Puck {
 
       this.vel = a_after;
       particle.vel = b_after;
+      console.log(this.vel);
     }
   }
 

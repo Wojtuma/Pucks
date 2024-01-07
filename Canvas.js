@@ -1,12 +1,11 @@
 import { Puck } from "./Pucks/Puck.js";
+import { Wood } from "./Pucks/Wood.js";
+import { Glass } from "./Pucks/Glass.js";
 import { Utility } from "./Utility.js";
 import { Vector } from "./Vector.js";
-
-function randomNumBetween(min, max) {
-    return min + Math.random() * (max - min);
-}
-  
+let movedParticle = null;
 export  class Canvas {
+  
     constructor() {
       this.canvas = document.createElement('canvas');
       this.ctx = this.canvas.getContext('2d');  
@@ -16,14 +15,9 @@ export  class Canvas {
       this.canvas.height = 800;
       this.setup();
 
-      
-      let movedParticle = null;
       let isMousePressed = false;
       let lastMousePos = new Vector(0, 0);
-      let lastTimestamp;
-      let totalDistance = 0;
-      let speed = 0;
-      let speedVector = new Vector(0, 0);
+      let mouseSpeed = new Vector(0, 0);
 
       this.canvas.addEventListener("mousedown", (e) => {
         const mousePos = new Vector(e.x, e.y);
@@ -31,6 +25,7 @@ export  class Canvas {
         nearestParticle.stop();
         isMousePressed = true;
         movedParticle = nearestParticle;
+        movedParticle.pos = mousePos;
         console.log(nearestParticle);
       });
 
@@ -38,31 +33,44 @@ export  class Canvas {
         const mousePos = new Vector(e.x, e.y);      
         if (isMousePressed) {
           movedParticle.pos = mousePos;
-          speedVector = new Vector((mousePos.x - lastMousePos.x), (mousePos.y - lastMousePos.y));
+          mouseSpeed = new Vector((mousePos.x - lastMousePos.x), (mousePos.y - lastMousePos.y));
           lastMousePos = mousePos;
         }
       });
-
+      
       this.canvas.addEventListener('mouseup', (e) => {
         isMousePressed = false;
-        console.log(movedParticle);
-        movedParticle.vel = speedVector;
+        if (Math.abs(mouseSpeed.x) <= 1 || Math.abs(mouseSpeed.y) <= 1) {
+          movedParticle.vel.x = 0;
+          movedParticle.vel.y = 0;
+        } else {
+          movedParticle.vel = mouseSpeed;
+        }
+        movedParticle = null;
       });
   
       requestAnimationFrame(() => this.update());
     }
 
     setup() {
-      const NUM_PARTICLES = 10;
+      const NUM_PARTICLES = 1;
       this.particles = [];
   
       for (let i = 0; i < NUM_PARTICLES; i++) {
         const newParticle = new Puck(
-          randomNumBetween(0, this.canvas.width),
-          randomNumBetween(0, this.canvas.height),
+          Utility.randomNumBetween(51, this.canvas.width - 51),
+          Utility.randomNumBetween(51, this.canvas.height - 51)
         );      
         this.particles.push(newParticle);
       }
+      /* this.particles.push(new Wood(
+        Utility.randomNumBetween(51, this.canvas.width - 51),
+        Utility.randomNumBetween(51, this.canvas.height - 51)
+      )); */
+      this.particles.push(new Glass(
+        Utility.randomNumBetween(51, this.canvas.width - 51),
+        Utility.randomNumBetween(51, this.canvas.height - 51)
+      ));
     }
 
     update() {
@@ -74,20 +82,23 @@ export  class Canvas {
 
         for(let p of rest) {
           p.checkCollision(current);
-          
         }
       }
       for (let particle of this.particles) {
-        let intervalId;
-        particle.update();
-        intervalId = setInterval(particle.handleEdges(this.canvas.width, this.canvas.height), 5000);
+        if(particle != movedParticle) {
+          if (particle.isBreakable && particle.hitPoints == 0) {
+            this.particles.pop(particle);
+          }
+          particle.update();
+        }
+        particle.handleEdges(this.canvas.width, this.canvas.height);
         
         /* if(particle.isOutOfBounds(this.canvas.width, this.canvas.height)) {
           this.particles.pop(particle);
           console.log(this.particles);
         } */
 
-        this.ctx.fillStyle = `rgba(255, 255, 255, 1)`;
+        
         this.ctx.beginPath();
         this.ctx.arc(
           particle.pos.x, 
@@ -96,7 +107,14 @@ export  class Canvas {
           0, 
           2 * Math.PI
         );
-        this.ctx.fill();
+        if (particle instanceof Glass) {
+          this.ctx.strokeStyle = particle.fillStyle;
+          this.ctx.lineWidth = particle.lineWidth;
+          this.ctx.stroke();
+        } else {
+          this.ctx.fillStyle = particle.fillStyle;
+          this.ctx.fill();
+        }
       }
   
       requestAnimationFrame(() => this.update());

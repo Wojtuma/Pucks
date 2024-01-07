@@ -1,6 +1,4 @@
-function randomNumBetween(min, max) {
-    return min + Math.random() * (max - min);
-}
+import { Utility } from "../Utility.js";
 
 export class Vector {
 	constructor(x, y) {
@@ -33,8 +31,8 @@ export class Vector {
 	}
 	static random(minX, maxX, minY, maxY) {
 	  return new Vector(
-		randomNumBetween(minX, maxX),
-		randomNumBetween(minY, maxY)
+		Utility.randomNumBetween(minX, maxX),
+		Utility.randomNumBetween(minY, maxY)
 	  );
 	}
   }

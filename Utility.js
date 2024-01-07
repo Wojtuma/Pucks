@@ -1,6 +1,8 @@
-
-
 export class Utility {
+    static randomNumBetween(min, max) {
+        return min + Math.random() * (max - min);
+    }
+
     static findNearest(mousePos, particles, width, height) {
         let nearestParticle = null;
         let nearestDistance = Math.hypot(width, height);
@@ -8,8 +10,8 @@ export class Utility {
         particles.forEach(particle => {
             const distance = this.calculateDistance(mousePos, particle.pos);
             if (distance < nearestDistance && this.isMouseOnParticle(mousePos, particle)) {
-            nearestDistance = distance;
-            nearestParticle = particle;
+                nearestDistance = distance;
+                nearestParticle = particle;
             }
         });
         if(nearestParticle == null) {
