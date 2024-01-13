@@ -5,6 +5,7 @@ export class Wood extends Puck{
   constructor(x, y) {
     super(x, y);
     this.MAX_VELOCITY = 3;
+    this.isFlamable = true;
     this.fillStyle = `rgba(139,69,19)`;
   }
 

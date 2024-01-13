@@ -11,16 +11,13 @@ export class Glass extends Puck{
     this.fillStyle = `rgba(255, 255, 255, 0.8)`;
   }
 
-  update() {
-    super.update();
-  }
-
   checkCollision(particle) {
     const v = Vector.sub(this.pos, particle.pos)
     const dist = v.mag();
     if (dist <= this.radius + particle.radius) {
       super.checkCollision(particle);
       this.hitPoints -= 1;
+      console.log(this.hitPoints);
     }
   }
 }

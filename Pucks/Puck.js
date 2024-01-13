@@ -7,7 +7,7 @@ export class Puck {
     this.vel = Vector.random(-1, 1, -1, 1);
     this.acc = new Vector(0, 0);
     this.radius = Math.floor(Utility.randomNumBetween(5, 50));
-    this.MAX_VELOCITY = 4;
+    this.MAX_VELOCITY = 5;
 
     this.isFlamable = false;
     this.isBreakable = false;
@@ -15,12 +15,16 @@ export class Puck {
     this.fillStyle = `rgba(255, 255, 255, 1)`;
   }
 
-  update() {
+  update(isAccelerating) {
     if (this.vel.x > this.MAX_VELOCITY) {
       this.vel.x = this.MAX_VELOCITY;
     }
     if (this.vel.y > this.MAX_VELOCITY) {
       this.vel.y = this.MAX_VELOCITY;
+    }
+    if(isAccelerating) {
+    this.acc.x = Math.sign(this.vel.x) * (0.05);
+		this.acc.y = Math.sign(this.vel.y) * (0.05);
     }
     this.pos = Vector.add(this.pos, this.vel);
     this.vel = Vector.add(this.vel, this.acc);
@@ -83,7 +87,6 @@ export class Puck {
 
       this.vel = a_after;
       particle.vel = b_after;
-      console.log(this.vel);
     }
   }
 
